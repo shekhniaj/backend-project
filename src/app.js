@@ -27,3 +27,8 @@ import userRouter from './routes/user.routes.js'
 app.use("/api/v1/users", userRouter)
 
 export { app };
+
+
+// add suffix to the multer file name
+// add proper validation for sign up fields
+// add email verification for sign up
