@@ -32,3 +32,4 @@ export { app };
 // add suffix to the multer file name
 // add proper validation for sign up fields
 // add email verification for sign up
+// modify response data for register controller. remove extra db call
