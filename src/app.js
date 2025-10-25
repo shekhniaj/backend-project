@@ -33,3 +33,5 @@ export { app };
 // add proper validation for sign up fields
 // add email verification for sign up
 // modify response data for register controller. remove extra db call
+// add email in updateUserDetails controller
+// add validation in changeCurrentPassword controller
