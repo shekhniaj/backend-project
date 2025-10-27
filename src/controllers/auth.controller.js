@@ -24,11 +24,13 @@ const generateAccessAndRefreshTokens = async (user) => {
 
 const registerUser = asyncHandler(async (req, res) => {
   // get user details from frontend
-  const { email, username, fullname, password } = req.body;
+  const { email, username, fullname, password } = req.body || {};
 
   // validation - not empty
   if (
-    [fullname, email, username, password].some((field) => field?.trim() === "")
+    [fullname, email, username, password].some(
+      (field) => !field || field?.trim() === ""
+    )
   ) {
     throw new ApiError(400, "all fields are required");
   }
@@ -90,10 +92,14 @@ const registerUser = asyncHandler(async (req, res) => {
 
 const loginUser = asyncHandler(async (req, res) => {
   // req.body -> data
-  const { email, username, password } = req.body;
+  const { email, username, password } = req.body || {};
 
   if (!username && !email) {
     throw new ApiError(400, "enter email or username");
+  }
+
+  if (!password) {
+    throw new ApiError(400, "enter password");
   }
 
   // find user in db using email or username
@@ -164,10 +170,9 @@ const logoutUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "User logged Out"));
 });
 
-// not tested
 const refreshAccessAndRefreshToken = asyncHandler(async (req, res) => {
   const incomingRefreshToken =
-    req.cookies.refreshToken || req.body.refreshToken;
+    req.cookies?.refreshToken || req.body?.refreshToken;
 
   if (!incomingRefreshToken) {
     throw new ApiError(401, "unauthorized request");
@@ -211,9 +216,4 @@ const refreshAccessAndRefreshToken = asyncHandler(async (req, res) => {
     );
 });
 
-export {
-  registerUser,
-  loginUser,
-  logoutUser,
-  refreshAccessAndRefreshToken,
-};
+export { registerUser, loginUser, logoutUser, refreshAccessAndRefreshToken };

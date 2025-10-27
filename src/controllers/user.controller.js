@@ -4,10 +4,18 @@ import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 
-// not tested
 const changeCurrentPassword = asyncHandler(async (req, res) => {
-  const { oldPassword, newPassword } = req.body;
-  const user = req.user;
+  const { oldPassword, newPassword } = req.body || {};
+
+  if (!oldPassword || !newPassword) {
+    throw new ApiError(400, "All fields are required");
+  }
+
+  if(oldPassword === newPassword){
+    throw new ApiError(400, "old and new password shouldn't be the same")
+  }
+
+  const user = await User.findById(req.user._id);
 
   // validate password with validator
 
@@ -26,16 +34,18 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id).select(
-    "-password -refreshToken"
-  );
+  // const user = await User.findById(req.user._id).select(
+  //   "-password -refreshToken"
+  // );
+
+  const user = req.user;
 
   return res.status(200).json(new ApiResponse(200, user, "Success"));
 });
 
 const updateUserDetails = asyncHandler(async (req, res) => {
   // will add email later
-  const { username, fullname } = req.body;
+  const { username, fullname } = req.body || {};
   let user = req.user;
 
   if (!username && !fullname) {
@@ -107,5 +117,5 @@ export {
   getCurrentUser,
   updateUserDetails,
   updateUserAvatar,
-  updateUserCoverImage
+  updateUserCoverImage,
 };
