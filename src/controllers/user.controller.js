@@ -11,8 +11,8 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
     throw new ApiError(400, "All fields are required");
   }
 
-  if(oldPassword === newPassword){
-    throw new ApiError(400, "old and new password shouldn't be the same")
+  if (oldPassword === newPassword) {
+    throw new ApiError(400, "old and new password shouldn't be the same");
   }
 
   const user = await User.findById(req.user._id);
