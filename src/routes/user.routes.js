@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   changeCurrentPassword,
   getCurrentUser,
+  getWatchHistory,
   updateUserAvatar,
   updateUserCoverImage,
   updateUserDetails,
@@ -26,5 +27,7 @@ router
 router
   .route("/me/cover-image")
   .patch(verifyJWT, upload.single("coverImage"), updateUserCoverImage);
+
+router.route("/me/watch-history").get(verifyJWT, getWatchHistory)
 
 export default router;
