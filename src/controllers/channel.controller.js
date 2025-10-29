@@ -74,4 +74,6 @@ const getChannel = asyncHandler(async (req, res) => {
     );
 });
 
+const getChannelRecentVideos = asyncHandler(async (req, res) => {})
+
 export { getChannel };

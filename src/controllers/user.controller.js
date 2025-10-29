@@ -169,6 +169,22 @@ const getWatchHistory = asyncHandler(async (req, res) => {
     );
 });
 
+const addWatchHistory = asyncHandler(async (req, res) => {
+
+})
+
+const deleteWatchHistory = asyncHandler(async (req, res) => {
+
+})
+
+const addSubscription = asyncHandler(async (req, res) => {
+
+})
+
+const deleteSubscription = asyncHandler(async (req, res) => {
+  
+})
+
 export {
   changeCurrentPassword,
   getCurrentUser,
