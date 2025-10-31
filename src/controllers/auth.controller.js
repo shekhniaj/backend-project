@@ -55,7 +55,7 @@ const registerUser = asyncHandler(async (req, res) => {
   // upload images, avatar to cloudinary
   const avatar = await uploadOnCloudinary(avatarLocalPath);
 
-  if (!avatar) {
+  if (!avatar || !avatar.secure_url) {
     throw new ApiError(502, "Error while uploading on cloudinary");
   }
 
@@ -71,13 +71,15 @@ const registerUser = asyncHandler(async (req, res) => {
     email,
     password,
     avatar: avatar.secure_url,
+    avatarPublicId: avatar.public_id,
     coverImage: coverImage?.secure_url || "",
+    coverImagePublicId: coverImage?.public_id || "",
   });
 
   // remove password and refresh token field from response
   // check for user creation
   const createdUser = await User.findById(user._id).select(
-    "-password -refreshToken"
+    "-password -refreshToken -avatarPublicId -coverImagePublicId"
   );
 
   if (!createdUser) {
@@ -126,6 +128,8 @@ const loginUser = asyncHandler(async (req, res) => {
   const {
     password: userPassword,
     refreshToken: userRefreshToken,
+    avatarPublicId,
+    coverImagePublicId,
     ...loggedInUser
   } = user.toObject();
 

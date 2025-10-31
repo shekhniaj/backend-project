@@ -1,7 +1,10 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 import { User } from "../models/user.model.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import {
+  removeFromCloudinary,
+  uploadOnCloudinary,
+} from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import mongoose from "mongoose";
 
@@ -36,7 +39,7 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 
 const getCurrentUser = asyncHandler(async (req, res) => {
   // const user = await User.findById(req.user._id).select(
-  //   "-password -refreshToken"
+  //   "-password -refreshToken -avatarPublicId -coverImagePublicId"
   // );
 
   const user = req.user;
@@ -58,7 +61,9 @@ const updateUserDetails = asyncHandler(async (req, res) => {
 
   await user.save({ validateBeforeSave: false });
 
-  user = await User.findById(user._id).select("-password -refreshToken");
+  user = await User.findById(user._id).select(
+    "-password -refreshToken -avatarPublicId -coverImagePublicId"
+  );
 
   return res
     .status(200)
@@ -66,6 +71,12 @@ const updateUserDetails = asyncHandler(async (req, res) => {
 });
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
+  let user = await User.findById(req.user._id);
+
+  if (!user) {
+    throw new ApiError("404", "user not found");
+  }
+
   const avatarLocalPath = req.file?.path;
 
   if (!avatarLocalPath) {
@@ -78,11 +89,21 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     throw new ApiError(502, "Error while uploading on cloudinary");
   }
 
-  const user = await User.findByIdAndUpdate(
+  // remove previous avatar
+  if (user.avatarPublicId) {
+    await removeFromCloudinary(user.avatarPublicId, "image");
+  }
+
+  user = await User.findByIdAndUpdate(
     req.user?._id,
-    { $set: { avatar: avatar.secure_url } },
+    {
+      $set: {
+        avatar: avatar.secure_url,
+        avatarPublicId: avatar.public_id,
+      },
+    },
     { new: true }
-  ).select("-password -refreshToken");
+  ).select("-password -refreshToken -avatarPublicId -coverImagePublicId");
 
   return res
     .status(200)
@@ -90,6 +111,12 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
 });
 
 const updateUserCoverImage = asyncHandler(async (req, res) => {
+  let user = await User.findById(req.user._id);
+
+  if (!user) {
+    throw new ApiError("404", "user not found");
+  }
+
   const coverImageLocalPath = req.file?.path;
 
   if (!coverImageLocalPath) {
@@ -102,11 +129,21 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
     throw new ApiError(502, "Error while uploading on cloudinary");
   }
 
-  const user = await User.findByIdAndUpdate(
+  // remove previous coverImage if have one
+  if (user.coverImagePublicId) {
+    await removeFromCloudinary(user.coverImagePublicId, "image");
+  }
+
+  user = await User.findByIdAndUpdate(
     req.user?._id,
-    { $set: { coverImage: coverImage.secure_url } },
+    {
+      $set: {
+        coverImage: coverImage.secure_url,
+        coverImagePublicId: coverImage.public_id,
+      },
+    },
     { new: true }
-  ).select("-password -refreshToken");
+  ).select("-password -refreshToken -avatarPublicId -coverImagePublicId");
 
   return res
     .status(200)
@@ -156,8 +193,8 @@ const getWatchHistory = asyncHandler(async (req, res) => {
     },
   ]);
 
-  if(!user) {
-    throw new ApiError(400, "user does not exists")
+  if (!user) {
+    throw new ApiError(400, "user does not exists");
   }
 
   const watchHistory = user[0]?.watchHistory;
@@ -169,21 +206,9 @@ const getWatchHistory = asyncHandler(async (req, res) => {
     );
 });
 
-const addWatchHistory = asyncHandler(async (req, res) => {
+const addWatchHistory = asyncHandler(async (req, res) => {});
 
-})
-
-const deleteWatchHistory = asyncHandler(async (req, res) => {
-
-})
-
-const addSubscription = asyncHandler(async (req, res) => {
-
-})
-
-const deleteSubscription = asyncHandler(async (req, res) => {
-  
-})
+const deleteWatchHistory = asyncHandler(async (req, res) => {});
 
 export {
   changeCurrentPassword,
@@ -191,5 +216,5 @@ export {
   updateUserDetails,
   updateUserAvatar,
   updateUserCoverImage,
-  getWatchHistory
+  getWatchHistory,
 };

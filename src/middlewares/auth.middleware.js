@@ -20,7 +20,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
   }
 
   const user = await User.findById(decodedToken?._id).select(
-    "-password -refreshToken"
+    "-password -refreshToken -avatarPublicId -coverImagePublicId"
   );
 
   if (!user) {
