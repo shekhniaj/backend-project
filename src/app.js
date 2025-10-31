@@ -24,11 +24,13 @@ app.use(cookieParser())
 import userRouter from './routes/user.routes.js'
 import authRouter from './routes/auth.routes.js'
 import channelRouter from './routes/channel.routes.js'
+import subscriptionRouter from './routes/subscription.routes.js'
 
 // routes declaration
 app.use("/api/v1/users", userRouter)
 app.use("/api/v1/auth", authRouter)
 app.use("/api/v1/channels", channelRouter)
+app.use("/api/v1/subscriptions", subscriptionRouter)
 
 export { app };
 
