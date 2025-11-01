@@ -8,6 +8,10 @@ import mongoose from "mongoose";
 const toggleSubscription = asyncHandler(async (req, res) => {
   const { channelId } = req.params;
 
+  if(!channelId){
+    throw new ApiError(400, "channel id is missing")
+  }
+
   if(!mongoose.Types.ObjectId.isValid(channelId)){
     throw new ApiError(400, "invalid channel id")
   }
