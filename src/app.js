@@ -25,12 +25,14 @@ import userRouter from './routes/user.routes.js'
 import authRouter from './routes/auth.routes.js'
 import channelRouter from './routes/channel.routes.js'
 import subscriptionRouter from './routes/subscription.routes.js'
+import videoRouter from './routes/video.routes.js'
 
 // routes declaration
 app.use("/api/v1/users", userRouter)
 app.use("/api/v1/auth", authRouter)
 app.use("/api/v1/channels", channelRouter)
 app.use("/api/v1/subscriptions", subscriptionRouter)
+app.use("/api/v1/videos", videoRouter)
 
 export { app };
 
@@ -41,6 +43,7 @@ export { app };
 // modify response data for register controller. remove extra db call
 // add email in updateUserDetails controller
 // add validation in changeCurrentPassword controller
+// add filefilter to multer so that it prevents wrong file type
 
 
 // add optional verifyjwt in channel router for the logged out user
