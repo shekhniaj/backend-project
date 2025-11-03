@@ -1,4 +1,6 @@
-import { Video } from "../models/video.model";
+import mongoose from "mongoose";
+import { Video } from "../models/video.model.js";
+import { ApiError } from "../utils/apiError.js";
 
 const getChannelVideos = async ({ channelId, page, limit }) => {
   const pageVal = parseInt(page, 10);
@@ -12,7 +14,7 @@ const getChannelVideos = async ({ channelId, page, limit }) => {
     .sort({ createdAt: -1 })
     .skip((pageVal - 1) * limitVal)
     .limit(limitVal)
-    .select("-videoFilePublicId -thumbnailPublicId");
+    .select("-videoFilePublicId -thumbnailPublicId -owner");
 
   return result;
 };
@@ -25,13 +27,7 @@ const getFeedVideos = async ({ page, limit }) => {
     {
       $sort: { createdAt: -1 },
     },
-    // using skip and limit first so that we can use lookup only on the documents we need
-    {
-      $skip: (pageVal - 1) * limitVal,
-    },
-    {
-      $limit: limitVal,
-    },
+    // use skip and limit first so that we can use lookup only on the documents we need, but as we are using paginate v2 package so we will use skip and limit as options. later we will optimize it.
     {
       $lookup: {
         from: "users",
@@ -64,7 +60,15 @@ const getFeedVideos = async ({ page, limit }) => {
     },
   ];
 
-  const result = await Video.aggregatePaginate(Video.aggregate(pipeline));
+  const options = {
+    page: pageVal,
+    limit: limitVal,
+  };
+
+  const result = await Video.aggregatePaginate(
+    Video.aggregate(pipeline),
+    options
+  );
 
   return result;
 };

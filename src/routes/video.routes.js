@@ -37,7 +37,9 @@ router
   .delete(verifyJWT, deleteVideo)
   .patch(verifyJWT, updateVideoDetails);
 
-router.route("/:videoId/thumbnail").patch(verifyJWT, updateThumbnail);
+router
+  .route("/:videoId/thumbnail")
+  .patch(verifyJWT, upload.single("thumbnail"), updateThumbnail);
 
 router.route("/:videoId/publish").patch(verifyJWT, togglePublishStatus);
 

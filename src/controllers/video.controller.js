@@ -124,7 +124,6 @@ const deleteVideo = asyncHandler(async (req, res) => {
     );
 });
 
-// not tested
 const getAllVideos = asyncHandler(async (req, res) => {
   const { type, channelId, page = 1, limit = 5 } = req.query || {};
 
@@ -177,7 +176,7 @@ const updateVideoDetails = asyncHandler(async (req, res) => {
     throw new ApiError(404, "video not found");
   }
 
-  if (video.owner.toString() !== req.user._id.toString()) {
+  if (video.owner._id.toString() !== req.user._id.toString()) {
     throw new ApiError(403, "you are unauthorized to update video details");
   }
 
@@ -214,7 +213,7 @@ const updateThumbnail = asyncHandler(async (req, res) => {
     throw new ApiError(404, "video not found");
   }
 
-  if (video.owner.toString() !== req.user._id.toString()) {
+  if (video.owner._id.toString() !== req.user._id.toString()) {
     throw new ApiError(403, "you are unauthorized to update video thumbnail");
   }
 
@@ -231,7 +230,7 @@ const updateThumbnail = asyncHandler(async (req, res) => {
   }
 
   // remove previous thumbnail from cloudinary
-  await removeFromCloudinary(video.thumbnailPublicId, "image")
+  await removeFromCloudinary(video.thumbnailPublicId, "image");
 
   video.thumbnail = thumbnail.secure_url;
   video.thumbnailPublicId = thumbnail.public_id;
@@ -274,7 +273,7 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
     throw new ApiError(404, "video not found");
   }
 
-  if (video.owner.toString() !== req.user._id.toString()) {
+  if (video.owner._id.toString() !== req.user._id.toString()) {
     throw new ApiError(403, "you are unauthorized to update video details");
   }
 
