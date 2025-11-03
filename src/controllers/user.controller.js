@@ -149,7 +149,7 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, user, "coverImage updated successfully"));
 });
-
+// not tested
 const getWatchHistory = asyncHandler(async (req, res) => {
   const user = await User.aggregate([
     {
