@@ -52,10 +52,6 @@ const uploadVideo = asyncHandler(async (req, res) => {
     owner: req.user._id,
   });
 
-  if (!video || !video._id) {
-    throw new ApiError(500, "video creation failed");
-  }
-
   const { videoFilePublicId, thumbnailPublicId, ...responseVideo } =
     video.toObject();
 
