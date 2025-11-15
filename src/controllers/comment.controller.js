@@ -28,7 +28,7 @@ const getVideoComments = asyncHandler(async (req, res) => {
 
   const comments = await Comment.aggregate([
     {
-      $match: { video: videoId },
+      $match: { video: new mongoose.Types.ObjectId(videoId) },
     },
     {
       $sort: { createdAt: -1 },
