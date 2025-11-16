@@ -6,25 +6,20 @@ const likeSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
     },
-    comment: {
+    content: {
       type: Schema.Types.ObjectId,
-      ref: "Comment",
+      required: true,
     },
-    video: {
-      type: Schema.Types.ObjectId,
-      ref: "Video",
-    },
-    tweet: {
-      type: Schema.Types.ObjectId,
-      ref: "Tweet",
+    contentType: {
+      type: String,
+      enum: ["video", "comment", "tweet"],
+      required: true,
     },
   },
   { timestamps: true }
 );
 
 // to avoid duplicate like document
-likeSchema.index({ likedBy: 1, comment: 1 }, { unique: true, sparse: true });
-likeSchema.index({ likedBy: 1, video: 1 }, { unique: true, sparse: true });
-likeSchema.index({ likedBy: 1, tweet: 1 }, { unique: true, sparse: true });
+likeSchema.index({ likedBy: 1, content: 1, contentType: 1 }, { unique: true });
 
 export const Like = mongoose.model("Like", likeSchema);
