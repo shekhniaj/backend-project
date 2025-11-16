@@ -20,23 +20,62 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
 
   const userExists = await User.exists({ _id: userId });
 
-  if(!userExists){
-    throw new ApiError(400, "user not found")
+  if (!userExists) {
+    throw new ApiError(400, "user not found");
   }
 
   const pageVal = parseInt(page, 10);
   const limitVal = parseInt(limit, 10);
   const skipVal = (pageVal - 1) * limitVal;
 
-  // we will update it later and send first video thumbnail in the response
-  const playlists = await Playlist.find({ owner: userId })
-    .sort({
-      createdAt: -1,
-    })
-    .skip(skipVal)
-    .limit(limitVal)
-    .select("name")
-    .lean();
+  // send first video thumbnail in the response
+  const playlists = await Playlist.aggregate([
+    {
+      $match: { owner: new mongoose.Types.ObjectId(userId) },
+    },
+    {
+      $sort: { createdAt: -1 },
+    },
+    // pagination before lookup
+    {
+      $skip: skipVal,
+    },
+    {
+      $limit: limitVal,
+    },
+    {
+      $project: {
+        name: 1,
+        firstVideo: { $arrayElemAt: ["$videos", 0] },
+      },
+    },
+    {
+      $lookup: {
+        from: "videos",
+        localField: "firstVideo",
+        foreignField: "_id",
+        as: "videoData",
+        pipeline: [
+          {
+            $project: {
+              thumbnail: 1,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $unwind: {
+        path: "$videoData",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $project: {
+        firstVideo: 0,
+      },
+    },
+  ]);
 
   return res
     .status(200)
