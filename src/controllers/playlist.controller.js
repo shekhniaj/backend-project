@@ -368,32 +368,3 @@ export {
   updatePlaylist,
   deletePlaylist,
 };
-
-// like getting code
-
-// const [data] = await Like.aggregate([
-//     {
-//       $match: {
-//         content: new mongoose.Types.ObjectId(contentId),
-//         contentType,
-//       },
-//     },
-//     {
-//       $group: {
-//         _id: null,
-//         totalLikes: { $sum: 1 },
-//         likedByCurrentUser: {
-//           $sum: {
-//             $cond: [{ $eq: ["$likedBy", userId] }, 1, 0],
-//           },
-//         },
-//       },
-//     },
-//     {
-//       $project: {
-//         _id: 0,
-//         totalLikes: 1,
-//         isLikedByCurrentUser: { $gt: ["$likedByCurrentUser", 0] },
-//       },
-//     },
-//   ]);
