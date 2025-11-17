@@ -21,7 +21,7 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
   const userExists = await User.exists({ _id: userId });
 
   if (!userExists) {
-    throw new ApiError(400, "user not found");
+    throw new ApiError(404, "user not found");
   }
 
   const pageVal = parseInt(page, 10);
@@ -372,13 +372,28 @@ export {
 // like getting code
 
 // const [data] = await Like.aggregate([
-//   { $match: { video: new mongoose.Types.ObjectId(videoId) } },
-//   {
-//     $group: {
-//       _id: null,
-//       likesCount: { $sum: 1 },
-//       likedByCurrentUser: { $addToSet: "$likedBy" },
+//     {
+//       $match: {
+//         content: new mongoose.Types.ObjectId(contentId),
+//         contentType,
+//       },
 //     },
-//   },
-// ]);
-// const isLiked = data?.likedByCurrentUser.includes(userId);
+//     {
+//       $group: {
+//         _id: null,
+//         totalLikes: { $sum: 1 },
+//         likedByCurrentUser: {
+//           $sum: {
+//             $cond: [{ $eq: ["$likedBy", userId] }, 1, 0],
+//           },
+//         },
+//       },
+//     },
+//     {
+//       $project: {
+//         _id: 0,
+//         totalLikes: 1,
+//         isLikedByCurrentUser: { $gt: ["$likedByCurrentUser", 0] },
+//       },
+//     },
+//   ]);
