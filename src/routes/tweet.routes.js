@@ -10,8 +10,8 @@ import { verifyJWT } from "../middlewares/auth.middleware.js";
 const router = Router();
 
 router.use(verifyJWT)
-// not tested
-router.route("/:userId").get(getUserTweets);
+
+router.route("/users/:userId").get(getUserTweets);
 
 router.route("/").post(createTweet);
 

@@ -30,7 +30,8 @@ const getUserTweets = asyncHandler(async (req, res) => {
   const tweets = await Tweet.find({ owner: userId })
     .sort({ createdAt: -1 })
     .skip((pageVal - 1) * limitVal)
-    .limit(limitVal);
+    .limit(limitVal)
+    .lean();
 
   return res
     .status(200)
