@@ -86,12 +86,12 @@ const getLikes = asyncHandler(async (req, res) => {
 
   const data = result || {
     totalLikes: 0,
-    isLiked: false
-  }
+    isLiked: false,
+  };
 
   return res
-  .status(200)
-  .json(new ApiResponse(200, data, "like data fetched successfully"))
+    .status(200)
+    .json(new ApiResponse(200, data, "like data fetched successfully"));
 });
 
 export { toggleLike, getLikes };
