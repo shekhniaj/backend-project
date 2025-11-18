@@ -100,7 +100,7 @@ const getPlaylistById = asyncHandler(async (req, res) => {
     .select("-videos")
     .populate({
       path: "owner",
-      select: "username avatar",
+      select: "username avatar -_id",
     })
     .lean();
 
@@ -191,7 +191,8 @@ const createPlaylist = asyncHandler(async (req, res) => {
 });
 
 const addVideoToPlaylist = asyncHandler(async (req, res) => {
-  const { videoId, playlistId } = req.params;
+  const { playlistId } = req.params;
+  const { videoId } = req.body || {};
 
   if (!videoId || !playlistId) {
     throw new ApiError(400, "video id and playlist id are required");
@@ -285,9 +286,7 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(
-      new ApiResponse(200, playlist, "video removed from playlist successfully")
-    );
+    .json(new ApiResponse(200, {}, "video removed from playlist successfully"));
 });
 
 const updatePlaylist = asyncHandler(async (req, res) => {
@@ -307,10 +306,12 @@ const updatePlaylist = asyncHandler(async (req, res) => {
     throw new ApiError(400, "invalid playlist id");
   }
 
-  const playlist = await Playlist.findById(playlistId).populate({
-    path: "owner",
-    select: "username avatar",
-  });
+  const playlist = await Playlist.findById(playlistId)
+    .populate({
+      path: "owner",
+      select: "username avatar",
+    })
+    .select("-videos");
 
   if (!playlist) {
     throw new ApiError(404, "playlist not found");

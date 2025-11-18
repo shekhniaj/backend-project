@@ -8,7 +8,7 @@ import {
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
-// not tested
+
 router
   .route("/video/:videoId")
   .get(getVideoComments)

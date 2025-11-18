@@ -130,6 +130,7 @@ const loginUser = asyncHandler(async (req, res) => {
     refreshToken: userRefreshToken,
     avatarPublicId,
     coverImagePublicId,
+    watchHistory,
     ...loggedInUser
   } = user.toObject();
 
