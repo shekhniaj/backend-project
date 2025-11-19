@@ -8,6 +8,8 @@ import { ApiResponse } from "../utils/apiResponse.js";
 import { Video } from "../models/video.model.js";
 import mongoose from "mongoose";
 import { getChannelVideos, getFeedVideos } from "../services/videoService.js";
+import { Like } from "../models/Like.model.js";
+import { Comment } from "../models/comment.model.js";
 
 const uploadVideo = asyncHandler(async (req, res) => {
   const { title, description } = req.body || {};
@@ -112,6 +114,14 @@ const deleteVideo = asyncHandler(async (req, res) => {
   await removeFromCloudinary(video.thumbnailPublicId, "image");
 
   await video.deleteOne();
+
+  // delete video likes and comments
+  await Like.deleteMany({
+    content: videoId,
+    contentType: "video",
+  });
+
+  await Comment.deleteMany({ video: videoId });
 
   return res
     .status(200)

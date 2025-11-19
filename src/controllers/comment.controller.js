@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/apiResponse.js";
 import { Video } from "../models/video.model.js";
 import { Comment } from "../models/comment.model.js";
 import mongoose from "mongoose";
+import { Like } from "../models/Like.model.js";
 
 const getVideoComments = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
@@ -160,6 +161,12 @@ const deleteComment = asyncHandler(async (req, res) => {
   }
 
   await comment.deleteOne();
+
+  // delete comment's like docs
+  await Like.deleteMany({
+    content: commentId,
+    contentType: "comment",
+  });
 
   return res
     .status(200)

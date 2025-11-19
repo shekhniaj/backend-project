@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/apiResponse.js";
 import mongoose from "mongoose";
 import { Tweet } from "../models/tweet.model.js";
 import { User } from "../models/user.model.js";
+import { Like } from "../models/Like.model.js";
 
 const getUserTweets = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
@@ -112,6 +113,12 @@ const deleteTweet = asyncHandler(async (req, res) => {
   }
 
   await tweet.deleteOne();
+
+  // delete tweet's like docs
+  await Like.deleteMany({
+    content: tweetId,
+    contentType: "tweet",
+  });
 
   return res
     .status(200)
