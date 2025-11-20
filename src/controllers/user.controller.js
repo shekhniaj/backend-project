@@ -1,6 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 import { User } from "../models/user.model.js";
+import { Video } from "../models/video.model.js";
 import {
   removeFromCloudinary,
   uploadOnCloudinary,
@@ -48,7 +49,7 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 });
 
 const updateUserDetails = asyncHandler(async (req, res) => {
-  // will add email later
+  // add email later
   const { username, fullname } = req.body || {};
   let user = req.user;
 
@@ -150,6 +151,7 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, user, "coverImage updated successfully"));
 });
 
+// we are not building a separate model for watch history. but creating a separate model for watch history is good for scalability.
 const getWatchHistory = asyncHandler(async (req, res) => {
   const user = await User.aggregate([
     {
@@ -212,9 +214,80 @@ const getWatchHistory = asyncHandler(async (req, res) => {
     );
 });
 
-const addWatchHistory = asyncHandler(async (req, res) => {});
+const addWatchHistory = asyncHandler(async (req, res) => {
+  const { videoId } = req.body || {};
 
-const deleteWatchHistory = asyncHandler(async (req, res) => {});
+  if (!videoId) {
+    throw new ApiError(400, "video id is missing");
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(videoId)) {
+    throw new ApiError(400, "invalid video id");
+  }
+
+  const video = await Video.exists({ _id: videoId });
+
+  if (!video) {
+    throw new ApiError(404, "video not found");
+  }
+
+  // delete if already exists in history
+  await User.updateOne(
+    { _id: req.user._id },
+    { $pull: { watchHistory: videoId } }
+  );
+
+  // add in the first index
+  await User.updateOne(
+    { _id: req.user._id },
+    {
+      $push: {
+        watchHistory: {
+          $each: [videoId],
+          $position: 0,
+        },
+      },
+    }
+  );
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { _id: videoId },
+        "video added to watch history successfully"
+      )
+    );
+});
+
+const deleteWatchHistory = asyncHandler(async (req, res) => {
+  const { videoId } = req.params;
+
+  if (!videoId) {
+    throw new ApiError(400, "video id is missing");
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(videoId)) {
+    throw new ApiError(400, "invalid video id");
+  }
+
+  // if video id is not in history nothing happens. if video id is in history it will remove it.
+  await User.updateOne(
+    { _id: req.user._id },
+    { $pull: { watchHistory: videoId } }
+  );
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { _id: videoId },
+        "video removed from history successfully"
+      )
+    );
+});
 
 export {
   changeCurrentPassword,
@@ -223,4 +296,6 @@ export {
   updateUserAvatar,
   updateUserCoverImage,
   getWatchHistory,
+  addWatchHistory,
+  deleteWatchHistory,
 };

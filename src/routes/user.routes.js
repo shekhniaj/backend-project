@@ -1,6 +1,8 @@
 import { Router } from "express";
 import {
+  addWatchHistory,
   changeCurrentPassword,
+  deleteWatchHistory,
   getCurrentUser,
   getWatchHistory,
   updateUserAvatar,
@@ -28,6 +30,13 @@ router
   .route("/me/cover-image")
   .patch(verifyJWT, upload.single("coverImage"), updateUserCoverImage);
 
-router.route("/me/watch-history").get(verifyJWT, getWatchHistory)
+router
+  .route("/me/watch-history")
+  .get(verifyJWT, getWatchHistory)
+  .post(verifyJWT, addWatchHistory);
+
+router
+  .route("/me/watch-history/:videoId")
+  .delete(verifyJWT, deleteWatchHistory);
 
 export default router;
